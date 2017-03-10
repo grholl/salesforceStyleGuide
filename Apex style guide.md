@@ -43,8 +43,6 @@ See the Internet for more arguments about why style guides are important and use
 ### Sources
 Since Apex is largely a Java and C# spin-off, I am largely relying on [Google Java Style Guide](http://google-styleguide.googlecode.com/svn/trunk/javaguide.html) first, then C# where those do not apply.  And some is just pulled out of my own opinions.
 
-This is still a living document and I'm happy to make changes.
-
 <a name="basics"></a>
 ## Basics
 <a name="special-characters"></a>
@@ -55,7 +53,7 @@ The only permissible whitespace characters in source code are newline and space 
 
 <a name="special-escape-sequences"></a>
 #### Special escape sequences
-For any character that has a special escape sequence (`\b`, `\t`, `\n`, `\f`, `\r`, `\"`, `\'` and `\\`), that sequence is used rather than the corresponding octal (e.g. `\012`) or Unicode (e.g. `\u000a`) escape.
+For any character that has a special escape sequence (`\b`, `\t`, `\n`, `\f`, `\r`, `\"`, `\'` and `\\ `), that sequence is used rather than the corresponding octal (e.g. `\012`) or Unicode (e.g. `\u000a`) escape.
 
 <a name="other-non-ascii-characters"></a>
 #### Other Non-ASCII Characters
@@ -72,7 +70,14 @@ What is important is that each class order its members in some logical order, wh
 
 <a name="indentation"></a>
 ### Indentation
-All blocks of code should be indented with 2 spaces.  Spaces, not tabs, to ensure that it looks the same on everyone's screen and doesn't waste horizontal space.
+All blocks of code should be indented with 4 spaces.  Spaces, not tabs, to ensure that it looks the same on everyone's screen and doesn't waste horizontal space.
+
+<a name="comments"></a>
+### Comments
+Prefer placing comments on a line by themselves. Single line comments use double forward slash's `//` followed by a space.
+  >  `// Here is a single line comment`
+
+  >  `/* Don't add single line comments this way */`
 
 <a name="new-lines-and-spaces"></a>
 ### New-lines and spaces
@@ -116,7 +121,7 @@ In a test method, use the `@isTest` attribute instead of the `testmethod` modifi
 
 We follow the Java standard of capitalization with the listed exceptions.  That means that statements (`for`, `if`, etc.) should be lowercase, constants should be `UPPER_CASE_WITH_UNDERSCORES`, classes and class-level variables should be declared as `UpperCamelCase`, and methods, parameters and local variables should all be declard as `lowerCamelCase`.
 
-Native Apex methods and classes should generally be referenced as written in official Salesforce documentation.  This means that schemas and classes are `UpperCamelCase` and methods are `lowerCamelCase`.  The only deviation from this rule is `SObject` which should be written as such (in the documentation, it is usually written `sObject` which does not conform to this style guide and should not be used).
+Native Apex methods and classes should generally be referenced as written in official Salesforce documentation.  This means that schemas and classes are `UpperCamelCase` and methods are `lowerCamelCase`. The only deviation from this rule is `SObject` which should be written as such (in the documentation, it is usually written `sObject` which does not conform to this style guide and should not be used).uch.
 
 However, when referencing any metadata (SObject, SObjectField, FieldSet, Action, Class, Page, etc.), use the declared capitalization.  Even when referencing a method, field, etc., that is not capitalized according to these rules, still use the declared capitalization.
 
@@ -126,52 +131,55 @@ However, when referencing any metadata (SObject, SObjectField, FieldSet, Action,
 ```java
 public class MyClass {
 
-  private Contact internallyUsedContact { get; set; }
+    private Contact internallyUsedContact { get; set; }
 
-  public Integer calculatedInteger {
-    get {
-      return 5;
-    }
-    set {
-      this.internallyUsedContact = [SELECT Id
-                                    FROM Contact
-                                    WHERE Number_of_Peanuts__c > :value
-                                    LIMIT 1];
-    }
-  }
-
-  private Id contactId {
-    get;
-    set {
-      System.debug('Why do this?');
-      this.contactId = value;
-    }
-  }
-
-  public void foo(Integer bar) {
-    if (bar == 3) {
-      // Diane often asks when bar is 3.
-      System.debug(this.debugCode(bar) + ' - hi there!');
-      return;
-    } else if (bar > 7) {
-      List<Integer> wasteOfSpace = new List<Integer>();
-      do {
-        wasteOfSpace.add(this.calculatedInteger);
-      } while (wasteOfSpace.size() < 5);
-    } else {
-      try {
-        upsert v;
-      } catch (Exception ex) {
-        handleException(ex);
-      }
+    public Integer calculatedInteger {
+        get {
+            return 5;
+        }
+        set {
+            this.internallyUsedContact = [
+                    SELECT Id
+                    FROM Contact
+                    WHERE Number_of_Peanuts__c > :value
+                    LIMIT 1
+            ];
+        }
     }
 
-    for (Integer i : wasteOfSpace) {
-      System.debug('Here\'s an integer! ' + i);
+    private Id contactId {
+        get;
+        set {
+            System.debug('Why do this?');
+            this.contactId = value;
+        }
     }
-  }
+
+    public void foo(Integer bar) {
+        if (bar == 3) {
+            // Diane often asks when bar is 3.
+            System.debug(this.debugCode(bar) + ' - hi there!');
+            return;
+        } else if (bar > 7) {
+            List<Integer> wasteOfSpace = new List<Integer>();
+            do {
+                wasteOfSpace.add(this.calculatedInteger);
+            } while (wasteOfSpace.size() < 5);
+        } else {
+            try {
+                upsert v;
+            } catch (Exception ex) {
+                handleException(ex);
+            }
+        }
+
+        for (Integer i : wasteOfSpace) {
+            System.debug('Here\'s an integer! ' + i);
+        }
+    }
 
 }
+
 ```
 
 
@@ -182,20 +190,23 @@ In general, SOQL should be declared inline where it is used.  In some cases, lik
 
 SOQL keywords (e.g., `SELECT`, `WHERE`, `TODAY`) should always be written in `ALL CAPS`.  Objects, fields and bind variables should be referenced as declared.  Each clause of the SOQL Query should be on its own line so that finding what changed in a diff is easier.  That is, each `SELECT`, `FROM`, `WHERE`, `AND`, `OR`, `GROUP BY`, `HAVING`, `ROLL UP`, `ORDER BY`, etc., with the exception of the first `SELECT` should start a new line.  That line should start in the same column as the most relevant `SELECT`.
 
-Long lists of fields in a `SELECT` clause should be ordered in a logical manner and broken to fit within page width, with subsequent lines aligned with the first field.  Always select `Id`, and always select it first.
+Long lists of fields in a `SELECT` clause should be ordered in a logical manner and broken to fit within page width, with subsequent lines aligned with a continuation indent.  Always select `Id`, and always select it first.
 
 Example (in context):
 
 ```java
 String typeToSelect = 'abcde';
-List<Contact> cnts = [SELECT Id, FirstName, LastName, Phone, Email,
-                             MailingCity, MailingState,
-                             (SELECT Id, ActivityDate, Origin, Type,
-                                     WhatId, What.Name, RecordTypeId
-                              FROM ActivityHistories
-                              WHERE Type = :typeToSelect)
-                      FROM Contact
-                      WHERE CreatedDate >= TODAY];
+List<Contact> cnts = [
+        SELECT Id, FirstName, LastName, Phone, Email,
+                MailingCity, MailingState, (
+                SELECT Id, ActivityDate, Origin, Type,
+                        WhatId, What.Name, RecordTypeId
+                FROM ActivityHistories
+                WHERE Type = :typeToSelect
+        )
+        FROM Contact
+        WHERE CreatedDate >= TODAY
+];
 ```
 
 <a name="apex-specific-sobject-constructor-syntax"></a>
@@ -205,11 +216,12 @@ When creating an SObject, generally prefer the Apex-specific syntax wherein all 
 Example:
 
 ```java
-Contact c = new Contact(RecordTypeId = CONTACT_RECORDTYPE_ID,
-                        FirstName = firstName,
-                        LastName = surname,
-                        MailingCountry = DEFAULT_COUNTRY
-                       );
+Contact c = new Contact(
+        RecordTypeId = CONTACT_RECORDTYPE_ID,
+        FirstName = firstName,
+        LastName = surname,
+        MailingCountry = DEFAULT_COUNTRY
+);
 ```
 
 <a name="teststarttest-and-teststoptest"></a>
@@ -219,9 +231,13 @@ When writing test cases, always use `Test.startTest();` and `Test.stopTest();`. 
 <a name="naming-conventions"></a>
 ## Naming Conventions
 
-<a name="class-and-trigger"></a>
-### Class and Trigger
-Name a class or trigger after what it does.  Triggers should be verbs and end with `Trigger` (e.g., `SyncCaseToplineWithDescriptionTrigger`).  Controllers and Controller Extensions should end with the word `Controller`.
+<a name="class"></a>
+### Class
+Name a class or trigger after what it does (e.g., `AccountTriggerHandler`). Controllers and Controller Extensions should end with the word `Controller`.  Use `UpperCamelCase`.
+
+<a name="trigger"></a>
+### Trigger
+Name a trigger after the SObject it operates against.  Triggers should be named with a combination of the SObject type followed by the word `Trigger` (e.g., `AccountTrigger`, `OpportunityTrigger`, `SomeCustomObjectTrigger`).  Triggers should not contain any logic, that should be left to the Handler class. Use `UpperCamelCase`.
 
 <a name="methods"></a>
 ### Methods
@@ -229,7 +245,5 @@ Methods should all be verbs.  Getters and setters should have no side effects (w
 
 <a name="test-classes"></a>
 ### Test classes
-Test classes should be named `TEST_ClassUnderTest`.  If the test is not a unit-level test but instead a broader test case, it it should be named `TEST_StuffThatsGenerallyBeingTested`.
+Test classes should be named `MyClassTests`. If the test is not a unit-level test but instead a broader test case, it it should be named `StuffBeingTestedTest`.
 
-
-> Written with [StackEdit](https://stackedit.io/).
